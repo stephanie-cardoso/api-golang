@@ -1,48 +1,19 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/stephanie-cardoso/api-golang/handler"
 )
 
 func Initialize() {
 	router := gin.Default()
-	router.GET("/opening", getOpening)
-	router.POST("/opening", newOpening)
-	router.DELETE("/opening", deleteOpening)
-	router.PUT("/opening", updateOpening)
-	router.GET("/openings", getOpenings)
+	handler.InitializeHandler()
+
+	router.GET("/opening", handler.GetOpening)
+	router.POST("/opening", handler.NewOpening)
+	router.DELETE("/opening", handler.DeleteOpening)
+	router.PUT("/opening", handler.UpdateOpening)
+	router.GET("/openings", handler.GetOpenings)
 
 	router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-}
-
-func getOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "get opening",
-	})
-}
-
-func newOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "post opening",
-	})
-}
-
-func deleteOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "delete opening",
-	})
-}
-
-func updateOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "put opening",
-	})
-}
-
-func getOpenings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "get openings",
-	})
 }
