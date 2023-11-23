@@ -79,7 +79,11 @@ func UpdateOpening(c *gin.Context) {
 }
 
 func GetOpenings(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "get openings",
-	})
+	openings := []schemas.Opening{}
+	if err := db.Find(&openings).Error; err != nil {
+		sendError(c, http.StatusInternalServerError, fmt.Sprint("failed to list openings"))
+		return
+	}
+
+	sendSucess(c, "get-openings", openings)
 }
