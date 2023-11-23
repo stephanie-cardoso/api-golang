@@ -7,12 +7,12 @@ func errParamIsRequired(name, typ string) error {
 }
 
 type NewOpeningRequest struct {
-	Role     string
-	Company  string
-	Location string
-	Remote   *bool // using bool as a pointer to force a true/false input
-	Link     string
-	Salary   int64
+	Role     string `json:"role"`
+	Company  string `json:"company"`
+	Location string `json:"location"`
+	Remote   *bool  `json:"remote"` // using bool as a pointer to force a true/false input
+	Link     string `json:"link"`
+	Salary   int64  `json:"salary"`
 }
 
 func (r *NewOpeningRequest) Validate() error {

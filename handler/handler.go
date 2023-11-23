@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/stephanie-cardoso/api-golang/config"
+	"github.com/stephanie-cardoso/api-golang/schemas"
 	"gorm.io/gorm"
 )
 
@@ -33,10 +34,21 @@ func NewOpening(c *gin.Context) {
 		return
 	}
 
-	if err := db.Create(&newOpening).Error; err != nil {
+	opening := schemas.Opening{
+		Role:     newOpening.Role,
+		Company:  newOpening.Company,
+		Location: newOpening.Location,
+		Remote:   *newOpening.Remote,
+		Link:     newOpening.Link,
+		Salary:   newOpening.Salary,
+	}
+
+	if err := db.Create(&opening).Error; err != nil {
 		log.Error().Err(err).Msgf("[handler] failed to create opening")
+		sendError(c, http.StatusInternalServerError, "error creating opening in database")
 		return
 	}
+	sendSucess(c, "create-opening", opening)
 }
 
 func DeleteOpening(c *gin.Context) {
