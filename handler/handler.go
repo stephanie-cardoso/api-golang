@@ -20,9 +20,19 @@ func InitializeHandler() {
 }
 
 func GetOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "get opening",
-	})
+	id := c.Query("id")
+	if id == "" {
+		sendError(c, http.StatusBadRequest, errParamIsRequired("id", "queryParameter").Error())
+		return
+	}
+
+	opening := schemas.Opening{}
+	if err := db.First(&opening, id).Error; err != nil {
+		sendError(c, http.StatusNotFound, fmt.Sprintf("opening with id %s not found in database", id))
+		return
+	}
+
+	sendSuccess(c, "get-opening", opening)
 }
 
 func NewOpening(c *gin.Context) {
@@ -49,7 +59,7 @@ func NewOpening(c *gin.Context) {
 		sendError(c, http.StatusInternalServerError, "error creating opening in database")
 		return
 	}
-	sendSucess(c, "create-opening", opening)
+	sendSuccess(c, "create-opening", opening)
 }
 
 func DeleteOpening(c *gin.Context) {
@@ -69,13 +79,41 @@ func DeleteOpening(c *gin.Context) {
 		sendError(c, http.StatusInternalServerError, fmt.Sprintf("failed to delete opening with id %s", id))
 		return
 	}
-	sendSucess(c, "delete-opening", opening)
+	sendSuccess(c, "delete-opening", opening)
 }
 
 func UpdateOpening(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "put opening",
-	})
+	receivedOpening := UpdateOpeningRequest{}
+
+	c.BindJSON(&receivedOpening)
+
+	if err := receivedOpening.Validate(); err != nil {
+		log.Error().Err(err).Msgf("[handler] validation error to update opening")
+		sendError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id := c.Query("id")
+	if id == "" {
+		sendError(c, http.StatusBadRequest, errParamIsRequired("id", "queryParameter").Error())
+		return
+	}
+
+	updatingOpening := schemas.Opening{}
+	if err := db.First(&updatingOpening, id).Error; err != nil {
+		sendError(c, http.StatusNotFound, "opening not found")
+		return
+	}
+
+	updatedOpening := updateOpening(receivedOpening, updatingOpening)
+	fmt.Println("PUT OPENING:", updatedOpening)
+	if err := db.Save(&updatedOpening).Error; err != nil {
+		log.Error().Err(err).Msgf("[handler] error updating opening")
+		sendError(c, http.StatusInternalServerError, "error updating opening")
+		return
+	}
+
+	sendSuccess(c, "update-opening", updatingOpening)
 }
 
 func GetOpenings(c *gin.Context) {
@@ -85,5 +123,33 @@ func GetOpenings(c *gin.Context) {
 		return
 	}
 
-	sendSucess(c, "get-openings", openings)
+	sendSuccess(c, "get-openings", openings)
+}
+
+func updateOpening(receivedOpening UpdateOpeningRequest, opening schemas.Opening) schemas.Opening {
+	if receivedOpening.Role != "" {
+		opening.Role = receivedOpening.Role
+	}
+
+	if receivedOpening.Company != "" {
+		opening.Company = receivedOpening.Company
+	}
+
+	if receivedOpening.Location != "" {
+		opening.Location = receivedOpening.Location
+	}
+
+	if receivedOpening.Remote != nil {
+		opening.Remote = *receivedOpening.Remote
+	}
+
+	if receivedOpening.Link != "" {
+		opening.Link = receivedOpening.Link
+	}
+
+	if receivedOpening.Salary > 0 {
+		opening.Salary = receivedOpening.Salary
+	}
+
+	return opening
 }
