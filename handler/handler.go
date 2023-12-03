@@ -19,6 +19,18 @@ func InitializeHandler() {
 	db = config.GetSQLite()
 }
 
+// @BasePath /
+
+// @Summary Get opening
+// @Description Show a job opening
+// @Tags Openings
+// @Accept json
+// @Produce json
+// @Param id query string true "Opening identification"
+// @Success 200 {object} GetOpeningResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /opening [get]
 func GetOpening(c *gin.Context) {
 	id := c.Query("id")
 	if id == "" {
@@ -35,8 +47,20 @@ func GetOpening(c *gin.Context) {
 	sendSuccess(c, "get-opening", opening)
 }
 
-func NewOpening(c *gin.Context) {
-	newOpening := NewOpeningRequest{}
+// @BasePath /
+
+// @Summary Create opening
+// @Description Create a new job opening
+// @Tags Openings
+// @Accept json
+// @Produce json
+// @Param request body CreateOpeningRequest true "Request body"
+// @Success 200 {object} CreateOpeningResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /opening [post]
+func CreateOpening(c *gin.Context) {
+	newOpening := CreateOpeningRequest{}
 	c.BindJSON(&newOpening)
 
 	if err := newOpening.Validate(); err != nil {
@@ -62,6 +86,18 @@ func NewOpening(c *gin.Context) {
 	sendSuccess(c, "create-opening", opening)
 }
 
+// @BasePath /
+
+// @Summary Delete opening
+// @Description Delete a new job opening
+// @Tags Openings
+// @Accept json
+// @Produce json
+// @Param id query string true "Opening identification"
+// @Success 200 {object} DeleteOpeningResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /opening [delete]
 func DeleteOpening(c *gin.Context) {
 	id := c.Query("id")
 	if id == "" {
@@ -82,6 +118,20 @@ func DeleteOpening(c *gin.Context) {
 	sendSuccess(c, "delete-opening", opening)
 }
 
+// @BasePath /
+
+// @Summary Update opening
+// @Description Update a job opening
+// @Tags Openings
+// @Accept json
+// @Produce json
+// @Param id query string true "Opening Identification"
+// @Param opening body UpdateOpeningRequest true "Opening data to Update"
+// @Success 200 {object} UpdateOpeningResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /opening [put]
 func UpdateOpening(c *gin.Context) {
 	receivedOpening := UpdateOpeningRequest{}
 
@@ -116,6 +166,16 @@ func UpdateOpening(c *gin.Context) {
 	sendSuccess(c, "update-opening", updatingOpening)
 }
 
+// @BasePath /
+
+// @Summary Get openings
+// @Description List all job openings
+// @Tags Openings
+// @Accept json
+// @Produce json
+// @Success 200 {object} ListOpeningsResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /openings [get]
 func GetOpenings(c *gin.Context) {
 	openings := []schemas.Opening{}
 	if err := db.Find(&openings).Error; err != nil {

@@ -14,7 +14,7 @@ func Initialize() {
 	handler.InitializeHandler()
 
 	router.GET("/opening", handler.GetOpening)
-	router.POST("/opening", handler.NewOpening)
+	router.POST("/opening", handler.CreateOpening)
 	router.DELETE("/opening", handler.DeleteOpening)
 	router.PUT("/opening", handler.UpdateOpening)
 	router.GET("/openings", handler.GetOpenings)
